@@ -1,0 +1,10 @@
+torch>=2.0.0
+transformers>=4.33.0
+fastapi>=0.95.0
+uvicorn>=0.21.1
+redis>=4.5.4
+prometheus-client>=0.16.0
+python-httpx>=0.24.0
+
+## Install system dependencies: 
+RUN apt-get install -y libgl1 libglib2.0-0
