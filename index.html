@@ -3,343 +3,433 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NSFW Playground - Explore Your Desires</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body class="min-h-screen bg-gray-900 text-white">
-    <!-- Age Verification Modal -->
-    <div id="age-verification-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-96">
-            <h2 class="text-xl font-bold mb-4">Welcome to NSFW Playground</h2>
-            <p class="mb-4">Choose how you want to proceed:</p>
-            <div class="flex flex-col space-y-3">
-                <button id="age-verification-confirm" class="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700">
-                    Sign Up / Login
-                </button>
-                <button id="age-verification-skip" class="px-4 py-2 bg-purple-600 rounded hover:bg-purple-700">
-                    Continue as Guest (No Auth Required)
-                </button>
-                <button id="age-verification-cancel" class="px-4 py-2 bg-gray-600 rounded hover:bg-gray-700">
-                    Exit
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main App Content -->
-    <div class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold mb-6">NSFW Playground</h1>
+    <title>🎭 NSFW Playground</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         
-        <!-- Auth Section -->
-        <div id="auth-section" class="mb-8 p-4 bg-gray-800 rounded-lg">
-            <h2 class="text-xl font-semibold mb-4">Authentication</h2>
-            <div class="flex flex-col space-y-4">
-                <button id="switch-to-guest" class="px-4 py-2 bg-gray-600 rounded hover:bg-gray-700 mb-4 hidden">
-                    Continue as Guest Instead
-                </button>
-                <input id="email" type="email" placeholder="Email" class="px-4 py-2 bg-gray-700 rounded">
-                <input id="password" type="password" placeholder="Password" class="px-4 py-2 bg-gray-700 rounded">
-                <div class="flex space-x-2">
-                    <button id="signup-btn" class="px-4 py-2 bg-purple-600 rounded hover:bg-purple-700">Sign Up</button>
-                    <button id="login-btn" class="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700">Login</button>
-                    <button id="logout-btn" class="px-4 py-2 bg-gray-600 rounded hover:bg-gray-700 hidden">Logout</button>
-                </div>
-                <div id="resend-section" class="hidden">
-                    <p class="text-sm text-gray-400">Didn't receive confirmation email?</p>
-                    <button id="resend-btn" class="px-4 py-2 bg-yellow-600 rounded hover:bg-yellow-700 text-sm">Resend Confirmation</button>
-                </div>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 5px;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            background: rgba(255,255,255,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .tab:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .tab-content {
+            display: none;
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        textarea {
+            height: 120px;
+            resize: vertical;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            color: #666;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .result h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .generated-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+        
+        .image-info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .download-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            width: auto;
+            display: inline-block;
+        }
+        
+        .download-btn:hover {
+            background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎭 NSFW Playground</h1>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('text')">📝 Text Generation</button>
+            <button class="tab" onclick="switchTab('image')">🎨 Image Generation</button>
+        </div>
+        
+        <!-- Text Generation Tab -->
+        <div id="text-tab" class="tab-content active">
+            <div class="form-group">
+                <label for="textPrompt">Enter your text prompt:</label>
+                <textarea id="textPrompt" placeholder="Describe what you want to generate..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="maxLength">Max Length:</label>
+                <input type="number" id="maxLength" value="100" min="10" max="500">
+            </div>
+            
+            <button onclick="generateText()" id="textBtn">Generate Text</button>
+            
+            <div class="loading" id="textLoading">
+                <div class="spinner"></div>
+                <p>Generating text...</p>
+            </div>
+            
+            <div id="textResult" class="result" style="display: none;">
+                <h3>Generated Text:</h3>
+                <p id="generatedText"></p>
             </div>
         </div>
-
-        <!-- Main Content (hidden until age verification) -->
-        <div id="main-content" class="hidden p-8">
-            <h2 class="text-2xl font-bold mb-4">Welcome to NSFW Playground</h2>
-            <div class="mb-6">
-                <h3 class="text-xl font-semibold mb-2">AI Content Generator</h3>
-                <p class="mb-2">Generate NSFW memes, widgets, quizzes, and more!</p>
-                <div class="flex flex-wrap gap-2 mb-4">
-                    <button id="generate-meme" class="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700">Generate Meme</button>
-                    <button id="generate-quiz" class="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700">Generate Quiz</button>
-                    <button id="generate-widget" class="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700">Generate Widget</button>
+        
+        <!-- Image Generation Tab -->
+        <div id="image-tab" class="tab-content">
+            <div class="form-group">
+                <label for="imagePrompt">Enter your image prompt:</label>
+                <textarea id="imagePrompt" placeholder="Describe the image you want to generate..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="negativePrompt">Negative prompt (optional):</label>
+                <textarea id="negativePrompt" placeholder="What you don't want in the image..." style="height: 80px;">low quality, blurry, distorted</textarea>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="width">Width:</label>
+                    <select id="width">
+                        <option value="512">512px</option>
+                        <option value="768">768px</option>
+                        <option value="1024" selected>1024px</option>
+                    </select>
                 </div>
-                <div id="generated-content" class="bg-gray-800 p-4 rounded-lg min-h-[200px]">
-                    <p id="content-placeholder">Click a button to generate content... (API integration in progress)</p>
-                    <div id="content-result" class="hidden"></div>
+                <div class="form-group">
+                    <label for="height">Height:</label>
+                    <select id="height">
+                        <option value="512">512px</option>
+                        <option value="768">768px</option>
+                        <option value="1024" selected>1024px</option>
+                    </select>
                 </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-gray-800 p-4 rounded-lg">
-                    <h3 class="text-xl font-semibold mb-2">Recent Content</h3>
-                    <p>View your recently generated items here.</p>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="steps">Inference Steps:</label>
+                    <input type="number" id="steps" value="20" min="10" max="50">
                 </div>
-                <div class="bg-gray-800 p-4 rounded-lg">
-                    <h3 class="text-xl font-semibold mb-2">Favorites</h3>
-                    <p>Save your favorite content for quick access.</p>
-                </div>
-                <div class="bg-gray-800 p-4 rounded-lg">
-                    <h3 class="text-xl font-semibold mb-2">Community</h3>
-                    <p>Share and explore content from other users.</p>
+                <div class="form-group">
+                    <label for="guidance">Guidance Scale:</label>
+                    <input type="number" id="guidance" value="7.5" min="1" max="20" step="0.5">
                 </div>
             </div>
-            <div id="auth-status" class="mt-6 p-4 bg-gray-800 rounded-lg">
-                <p>Authentication status: <span id="status-message">Loading...</span></p>
+            
+            <div class="form-group">
+                <label for="seed">Seed (-1 for random):</label>
+                <input type="number" id="seed" value="-1">
+            </div>
+            
+            <button onclick="generateImage()" id="imageBtn">Generate Image</button>
+            
+            <div class="loading" id="imageLoading">
+                <div class="spinner"></div>
+                <p>Generating image... This may take a few minutes.</p>
+            </div>
+            
+            <div id="imageResult" class="result" style="display: none;">
+                <h3>Generated Image:</h3>
+                <img id="generatedImage" class="generated-image" alt="Generated image">
+                <div class="image-info" id="imageInfo"></div>
+                <button class="download-btn" onclick="downloadImage()" id="downloadBtn">Download Image</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Initialize Supabase
-        const supabaseUrl = "https://qjvceczczoivyibdqxqf.supabase.co";
-        const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqdmNlY3pjem9pdnlpYmRxeHFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDczMDg5NTgsImV4cCI6MjA2Mjg4NDk1OH0.vLNnDo1a5n84E_E11WF0dsKzLtYlsVbCIg-9DOUJr5w";
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
-
-        // Age Verification
-        const ageVerificationModal = document.getElementById("age-verification-modal");
-        const ageVerificationCancel = document.getElementById("age-verification-cancel");
-        const ageVerificationConfirm = document.getElementById("age-verification-confirm");
-        const mainContent = document.getElementById("main-content");
-
-        // Simplified verification flow
-        function hideAgeVerificationModal() {
-            ageVerificationModal.style.display = 'none';
-            mainContent.style.display = 'block';
-        }
-
-        ageVerificationCancel.addEventListener("click", () => {
-            window.location.href = "https://www.google.com";
-        });
-
-        // Guest mode - no auth required
-        document.getElementById("age-verification-skip").addEventListener("click", () => {
-            hideAgeVerificationModal();
-            document.getElementById("auth-section").style.display = 'none';
-            localStorage.setItem("guestMode", "true");
-        });
-
-        // Auth mode
-        ageVerificationConfirm.addEventListener("click", () => {
-            hideAgeVerificationModal();
-            document.getElementById("auth-section").style.display = 'block';
-            localStorage.removeItem("guestMode");
-        });
-
-        // Initial load
-        if (localStorage.getItem("guestMode")) {
-            hideAgeVerificationModal();
-            document.getElementById("auth-section").style.display = 'none';
-            document.getElementById("status-message").textContent = 'Using guest mode';
-        } else {
-            document.getElementById("auth-section").style.display = 'block';
-            document.getElementById("status-message").textContent = 'Please sign up or login';
-        }
-
-        // Auth Functions
-        document.getElementById("signup-btn").addEventListener("click", async () => {
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
-            
-            // Add loading state
-            const btn = document.getElementById("signup-btn");
-            btn.disabled = true;
-            btn.textContent = "Signing up...";
-            
-            // Disable email confirmation during development
-            const { data, error } = await supabase.auth.signUp({
-                email,
-                password,
-                options: {
-                    emailRedirectTo: window.location.origin,
-                    data: { skip_confirmation: true }
-                }
+        let currentImageData = null;
+        
+        function switchTab(tab) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
             });
             
-            if (error) {
-                alert(`Signup error: ${error.message}`);
-            } else {
-                // Auto-login after successful signup
-                const { error: loginError } = await supabase.auth.signInWithPassword({
-                    email,
-                    password
-                });
-                
-                if (loginError) {
-                    alert(`Auto-login failed: ${loginError.message}`);
-                } else {
-                    alert(`Welcome! You're now logged in as ${email}`);
-                    document.getElementById("login-btn").classList.add("hidden");
-                    document.getElementById("signup-btn").classList.add("hidden");
-                    document.getElementById("logout-btn").classList.remove("hidden");
-                }
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tabBtn => {
+                tabBtn.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tab + '-tab').classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+        
+        async function generateText() {
+            const prompt = document.getElementById('textPrompt').value;
+            const maxLength = parseInt(document.getElementById('maxLength').value);
+            
+            if (!prompt.trim()) {
+                alert('Please enter a prompt');
+                return;
             }
             
-            // Reset button
-            btn.disabled = false;
-            btn.textContent = "Sign Up";
-        });
-
-        // Switch to guest mode
-        document.getElementById("switch-to-guest").addEventListener("click", () => {
-            localStorage.setItem("guestUser", "true");
-            document.getElementById("auth-section").classList.add("hidden");
-            document.getElementById("resend-section").classList.add("hidden");
-            document.getElementById("switch-to-guest").classList.add("hidden");
-            alert("Switched to guest mode. Enjoy your visit!");
-        });
-
-        supabase.auth.onAuthStateChange((event, session) => {
-            console.log("Auth state changed:", event, session);
-            const statusMessage = document.getElementById("status-message");
-            if (session) {
-                statusMessage.textContent = `Logged in as ${session.user.email}`;
-            } else {
-                statusMessage.textContent = localStorage.getItem("guestMode") ? 'Using guest mode' : 'Please sign up or login';
-            }
-        });
-
-        // AI Content Generator
-        function displayGeneratedContent(type, content) {
-            const placeholder = document.getElementById("content-placeholder");
-            const result = document.getElementById("content-result");
-            placeholder.classList.add("hidden");
-            result.classList.remove("hidden");
-            result.innerHTML = `<h4 class="text-lg font-semibold mb-2">Generated ${type}</h4><div>${content}</div>`;
-        }
-
-        document.getElementById("generate-meme").addEventListener("click", async () => {
+            document.getElementById('textLoading').style.display = 'block';
+            document.getElementById('textResult').style.display = 'none';
+            document.getElementById('textBtn').disabled = true;
+            
             try {
-                displayGeneratedContent("Meme", "<p class='text-yellow-300'>Attempting to connect to image generation API...</p>");
+                const response = await fetch('/generate-text', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        max_length: maxLength
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('generatedText').textContent = data.generated_text;
+                    document.getElementById('textResult').style.display = 'block';
+                } else {
+                    alert('Error: ' + data.detail);
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
+            } finally {
+                document.getElementById('textLoading').style.display = 'none';
+                document.getElementById('textBtn').disabled = false;
+            }
+        }
+        
+        async function generateImage() {
+            const prompt = document.getElementById('imagePrompt').value;
+            const negativePrompt = document.getElementById('negativePrompt').value;
+            const width = parseInt(document.getElementById('width').value);
+            const height = parseInt(document.getElementById('height').value);
+            const steps = parseInt(document.getElementById('steps').value);
+            const guidance = parseFloat(document.getElementById('guidance').value);
+            const seed = parseInt(document.getElementById('seed').value);
+            
+            if (!prompt.trim()) {
+                alert('Please enter an image prompt');
+                return;
+            }
+            
+            document.getElementById('imageLoading').style.display = 'block';
+            document.getElementById('imageResult').style.display = 'none';
+            document.getElementById('imageBtn').disabled = true;
+            
+            try {
                 const response = await fetch('/generate-image', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ prompt: 'NSFW meme about fantasy', api_key: 'YOUR_SECRET_KEY' })
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        negative_prompt: negativePrompt,
+                        width: width,
+                        height: height,
+                        num_inference_steps: steps,
+                        guidance_scale: guidance,
+                        seed: seed
+                    })
                 });
+                
                 const data = await response.json();
-                if (data.status === 'success') {
-                    displayGeneratedContent("Meme", `<img src='${data.image_url}' alt='Generated Meme' class='w-full rounded'>`);
+                
+                if (response.ok) {
+                    currentImageData = data.image;
+                    document.getElementById('generatedImage').src = data.image;
+                    document.getElementById('imageInfo').innerHTML = `
+                        <strong>Prompt:</strong> ${data.prompt}<br>
+                        <strong>Seed:</strong> ${data.seed}<br>
+                        <strong>Dimensions:</strong> ${width}x${height}<br>
+                        <strong>Steps:</strong> ${steps} | <strong>Guidance:</strong> ${guidance}
+                    `;
+                    document.getElementById('imageResult').style.display = 'block';
                 } else {
-                    displayGeneratedContent("Meme", `<p class='text-red-300'>Error: ${data.detail || 'Unknown error'}</p>`);
+                    alert('Error: ' + data.detail);
                 }
             } catch (error) {
-                displayGeneratedContent("Meme", `<p class='text-red-300'>Error connecting to API: ${error.message}. Using placeholder.</p><img src='https://via.placeholder.com/500x300?text=NSFW+Meme' alt='Placeholder Meme' class='w-full rounded mt-2'>`);
+                alert('Network error: ' + error.message);
+            } finally {
+                document.getElementById('imageLoading').style.display = 'none';
+                document.getElementById('imageBtn').disabled = false;
             }
-        });
-
-        document.getElementById("generate-quiz").addEventListener("click", async () => {
-            try {
-                displayGeneratedContent("Quiz", "<p class='text-yellow-300'>Attempting to connect to text generation API...</p>");
-                const response = await fetch('/generate-text', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ prompt: 'Create an NSFW quiz with 3 questions', max_length: 200, api_key: 'YOUR_SECRET_KEY' })
-                });
-                const data = await response.json();
-                if (data.status === 'success') {
-                    displayGeneratedContent("Quiz", `<div>${data.text.replace(/\n/g, '<br>')}</div>`);
-                } else {
-                    displayGeneratedContent("Quiz", `<p class='text-red-300'>Error: ${data.detail || 'Unknown error'}</p>`);
-                }
-            } catch (error) {
-                displayGeneratedContent("Quiz", `<p class='text-red-300'>Error connecting to API: ${error.message}. Using placeholder.</p><p class='font-semibold mt-2'>NSFW Quiz: What's your fantasy?</p><ul class='list-disc pl-5'><li>Option A</li><li>Option B</li><li>Option C</li></ul>`);
-            }
-        });
-
-        document.getElementById("generate-widget").addEventListener("click", async () => {
-            try {
-                displayGeneratedContent("Widget", "<p class='text-yellow-300'>Attempting to connect to text generation API...</p>");
-                const response = await fetch('/generate-text', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ prompt: 'Create an NSFW interactive widget description', max_length: 150, api_key: 'YOUR_SECRET_KEY' })
-                });
-                const data = await response.json();
-                if (data.status === 'success') {
-                    displayGeneratedContent("Widget", `<div>${data.text.replace(/\n/g, '<br>')}</div>`);
-                } else {
-                    displayGeneratedContent("Widget", `<p class='text-red-300'>Error: ${data.detail || 'Unknown error'}</p>`);
-                }
-            } catch (error) {
-                displayGeneratedContent("Widget", `<p class='text-red-300'>Error connecting to API: ${error.message}. Using placeholder.</p><div class='bg-gray-700 p-3 rounded mt-2'><p class='font-semibold'>NSFW Widget</p><p>Interactive content goes here.</p></div>`);
-            }
-        });
-
-        document.getElementById("login-btn").addEventListener("click", async () => {
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
+        }
+        
+        function downloadImage() {
+            if (!currentImageData) return;
             
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-            
-            if (error) {
-                alert("Login error: " + error.message);
-            } else {
-                alert("Login successful!");
-                document.getElementById("login-btn").classList.add("hidden");
-                document.getElementById("signup-btn").classList.add("hidden");
-                document.getElementById("logout-btn").classList.remove("hidden");
-            }
-        });
-
-        document.getElementById("logout-btn").addEventListener("click", async () => {
-            const { error } = await supabase.auth.signOut();
-            if (error) {
-                alert("Logout error: " + error.message);
-            } else {
-                alert("Logged out successfully");
-                document.getElementById("login-btn").classList.remove("hidden");
-                document.getElementById("signup-btn").classList.remove("hidden");
-                document.getElementById("logout-btn").classList.add("hidden");
-            }
-        });
-
-        // Auth state listener
-        // Resend confirmation email
-        document.getElementById("resend-btn").addEventListener("click", async () => {
-            const email = document.getElementById("email").value;
-            const btn = document.getElementById("resend-btn");
-            
-            btn.disabled = true;
-            btn.textContent = "Sending...";
-            
-            const { error } = await supabase.auth.resend({
-                type: 'signup',
-                email: email
-            });
-            
-            if (error) {
-                alert(`Failed to resend: ${error.message}`);
-            } else {
-                alert(`Confirmation resent to ${email}\nCheck your spam folder if not received.`);
-            }
-            
-            btn.disabled = false;
-            btn.textContent = "Resend Confirmation";
-        });
-
-        // Show resend button after signup
-        supabase.auth.onAuthStateChange((event, session) => {
-            console.log("Auth state changed:", event, session);
-            const resendSection = document.getElementById("resend-section");
-            if (event === 'SIGNED_IN') {
-                resendSection.classList.add("hidden");
-            } else if (event === 'SIGNED_OUT') {
-                resendSection.classList.add("hidden");
-            }
-        });
-
-        // Show resend button when needed
-        document.getElementById("signup-btn").addEventListener("click", () => {
-            setTimeout(() => {
-                const resendSection = document.getElementById("resend-section");
-                resendSection.classList.remove("hidden");
-            }, 3000);
-        });
+            const link = document.createElement('a');
+            link.href = currentImageData;
+            link.download = `generated-image-${Date.now()}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
     </script>
 </body>
 </html>
